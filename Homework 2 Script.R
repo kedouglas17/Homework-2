@@ -1,18 +1,16 @@
 #####################################
 # ID 529 Homework 2
 #####################################
-
+# https://github.com/ID529-Coursework/homework-2-kedouglas17 instructions on doing homework.
 # This uses directions and README from https://github.com/ID529/ID529data 
 
 
 # Linking to Github -------------------------------------------------------
 
-#Accidentally made project first, so will then link to Github
-
-#In terminal will use:
-#git remote add origin https://github.com/kedouglas17/Homework-2.git
-#git branch -M main
-#git push -u origin main
+#In terminal of R studio, use:
+#    git remote add origin https://github.com/kedouglas17/Homework-2.git
+#    git branch -M main
+#    git push -u origin main
 
 # Loading Dependencies ----------------------------------------------------
 install.packages("devtools")
@@ -35,9 +33,14 @@ labelled::generate_dictionary(nhanes_id529, details = 'full')
 
 
 # Univariate figure -------------------------------------------------------
-#Looking at the distribution of income (as percent of FPL) among the study population
+#Looking at the distribution of income (as percent of FPL) among the study 
+#population - one thing I've been curious about with NHANES is who actually 
+#completes the many tasks included and how representative those people are 
+#of the US population
 
-ggplot(data=nhanes_id529, aes(x = `poverty_ratio`)) +
+# useful to use the ggplot cheat sheet https://posit.co/resources/cheatsheets/
+
+ggplot(data=nhanes_id529, aes(x = poverty_ratio)) +
   geom_histogram(bins = 40) +
   theme_bw() +
   labs(
@@ -50,21 +53,33 @@ ggsave("Univariate analysis.png")
 
 # Bivariate figure --------------------------------------------------------
 
-ggplot(data=nhanes_id529, aes(x = `poverty_ratio`)) +
-  geom_histogram(bins = 40) +
+#Before doing any regression, want to know relationship between age and mean BP at baseline
+ggplot(data=nhanes_id529) +
+  geom_point(mapping=aes(x = age, y=mean_BP)) +
+  geom_smooth(aes(x = age, y = mean_BP), method = "lm", se = TRUE) +
   theme_bw() +
   labs(
-    title = "Histogram of distribution of FPL among NHANES participants",
-    x = "% Federal Poverty Level",
-    y = "Frequency"
+    title = "Scatterplot of age vs mean systolic blood pressure in NHANES participants",
+    x = "Age (years)",
+    y = "Mean systolic blood pressure (in mmHg)"
   )
-ggsave("Univariate analysis.png")
-
-
+ggsave("Bivariate analysis.png")
 
 
 
 
 # Bivariate figure with facets --------------------------------------------
 
+#Does that relationship between age and SBP change based on gender/sex? 
+ggplot(data=nhanes_id529) +
+  geom_point(mapping=aes(x = age, y=mean_BP)) +
+  geom_smooth(aes(x = age, y = mean_BP), method = "lm", se = TRUE) +
+  facet_wrap(~ sex_gender) +
+  theme_bw() +
+  labs(
+    title = "Scatterplot of age vs mean systolic blood pressure in NHANES participants, divided by gender",
+    x = "Age (years)",
+    y = "Mean systolic blood pressure (in mmHg)"
+  )
+ggsave("Bivariate analysis with facets.png")
 
