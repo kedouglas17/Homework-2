@@ -88,7 +88,7 @@ ggsave("Bivariate analysis with facets.png")
 
 
 
-# Part 2 - Creating regression model --------------------------------------
+# Part 2 - Creating and visualizing regression model --------------------------------------
 
 
 
@@ -102,19 +102,32 @@ lmmodel1 <- lm(mean_BP ~ age + sex_gender, data=nhanes_id529)
 print(lmmodel1)
 summary(lmmodel1)
 
-#Make a tibble out of this regression model
-broom::tidy(lmmodel1, conf.int=TRUE)
+#Make a tibble out of this regression model and export as CSV
+lmmodel1_table<-broom::tidy(lmmodel1, conf.int=TRUE)
+write.csv(lmmodel1_table, file="Linear regression model output")
+
+#Create ggplot of model coefficients
+ggplot(data=lmmodel1_table [lmmodel1_table$term != "(Intercept)", ]) +
+  geom_pointrange(mapping=aes(y = term, x=estimate, xmin=conf.low, xmax=conf.high)) +
+  theme_bw() +
+  labs(
+    title = "Forest plot of regression estimates",
+    x = "Estimated effect (95% CI)",
+    y = "Model term"
+  )
+ggsave("Forest plot of regression estimates.png")
 
 
 
+#Create a summary table of the coefficients and confidence intervals for covariates in this model
+install.packages("gtsummary")
+library(gtsummary)
+tbl_regression(lmmodel1)
+regression_stats<-tbl_regression(lmmodel1)
+print(regression_stats)
 
 
 
-you could extract the model coefficients with broom::tidy() and write those to a CSV file
-you could extract the model coefficients with broom::tidy() and plot them with ggplot (we would use geom_pointrange to create a forest plots)
-you could extract the output from running summary() on your model and save that to a .txt file
-you can use capture.output() to grab the output of summary() and use writeLines() to write that to a .txt file
-you could save some or all of the diagnostic plots to image files
-you could use the gtsummary or stargazer packages to report on the model coefficients and the model performance
-you could write a markdown file that presents a summary of your findings
-if you include a markdown file in your submission, that's a great place to discuss both your rationale for what you chose to include in your model as well as some discussion about the model findings (do they agree/disagree with your intuition? do they surprise you?). it's also great to practice putting into words what the model coefficients represent (e.g., something like "for every one unit increase in [predictor variable], the model predicted an increase in [outcome variable] of XX").
+# Final thoughts ----------------------------------------------------------
+
+#Thanks for looking through my code! Let me know how I can make it better :) 
