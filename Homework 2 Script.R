@@ -14,12 +14,14 @@
 
 # Loading Dependencies ----------------------------------------------------
 install.packages("devtools")
+install.packages("broom")
 
 library(devtools)
 devtools::install_github("ID529/ID529data")
 #Updated all dependencies as part of this
 library(ggplot2)
 library(ID529data)
+library(broom)
 
 # Loading Data ------------------------------------------------------------
 
@@ -32,7 +34,7 @@ labelled::generate_dictionary(nhanes_id529, details = 'full')
 
 
 
-# Univariate figure -------------------------------------------------------
+# Part 1 - Figures. Univariate figure -------------------------------------------------------
 #Looking at the distribution of income (as percent of FPL) among the study 
 #population - one thing I've been curious about with NHANES is who actually 
 #completes the many tasks included and how representative those people are 
@@ -83,3 +85,36 @@ ggplot(data=nhanes_id529) +
   )
 ggsave("Bivariate analysis with facets.png")
 
+
+
+
+# Part 2 - Creating regression model --------------------------------------
+
+
+
+
+
+#Refer to lecture slides for example https://id529.github.io/day4.html
+#Interested in how systolic blood pressure changes based on age and sex
+lmmodel1 <- lm(mean_BP ~ age + sex_gender, data=nhanes_id529)
+
+#to understand what the intercept and coefficients are
+print(lmmodel1)
+summary(lmmodel1)
+
+#Make a tibble out of this regression model
+broom::tidy(lmmodel1, conf.int=TRUE)
+
+
+
+
+
+
+you could extract the model coefficients with broom::tidy() and write those to a CSV file
+you could extract the model coefficients with broom::tidy() and plot them with ggplot (we would use geom_pointrange to create a forest plots)
+you could extract the output from running summary() on your model and save that to a .txt file
+you can use capture.output() to grab the output of summary() and use writeLines() to write that to a .txt file
+you could save some or all of the diagnostic plots to image files
+you could use the gtsummary or stargazer packages to report on the model coefficients and the model performance
+you could write a markdown file that presents a summary of your findings
+if you include a markdown file in your submission, that's a great place to discuss both your rationale for what you chose to include in your model as well as some discussion about the model findings (do they agree/disagree with your intuition? do they surprise you?). it's also great to practice putting into words what the model coefficients represent (e.g., something like "for every one unit increase in [predictor variable], the model predicted an increase in [outcome variable] of XX").
